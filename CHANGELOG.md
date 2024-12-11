@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Other
 
+- Update show case url
 - Change the paragraph of README
 - Add show case in README
 
