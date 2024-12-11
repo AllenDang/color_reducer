@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use image::{DynamicImage, ImageBuffer, Rgba, RgbaImage};
-use kd_tree::KdTree;
+use palette::{cast, color_difference::EuclideanDistance, FromColor, Lab, Srgb};
 use rayon::prelude::*;
 
 // Union-Find Data Structure
@@ -58,32 +58,49 @@ impl ColorReducer {
         // Convert the pixel data of the image into a parallel iterator
         let pixels: Vec<Rgba<u8>> = rgba_image.pixels().copied().collect();
 
-        let kd_palette_lab = KdTree::build_by_ordered_float(
-            self.palette
-                .iter()
-                .map(|&rgb| {
-                    let [r, g, b] = rgb;
-                    [r as f32, g as f32, b as f32]
-                })
-                .collect(),
-        );
+        // Process the pixel data, replacing it with colors from the palette
+        let palette_lab: Vec<Lab> = self
+            .palette
+            .iter()
+            .map(|&rgb| {
+                let srgb = cast::from_array_ref::<Srgb<u8>>(&rgb);
+                Lab::from_color(srgb.into_linear())
+            })
+            .collect();
 
         let simplified_pixels: Vec<Rgba<u8>> = pixels
             .par_iter()
             .map(|pixel| {
-                let rgb = [pixel[0] as f32, pixel[1] as f32, pixel[2] as f32];
+                let rgb = [pixel[0], pixel[1], pixel[2]];
+                let srgb = Srgb::new(
+                    rgb[0] as f32 / 255.0,
+                    rgb[1] as f32 / 255.0,
+                    rgb[2] as f32 / 255.0,
+                );
+                let lab = Lab::from_color(srgb.into_linear());
 
-                match kd_palette_lab.nearest(&rgb) {
-                    Some(found) => {
-                        let closest_color = found.item;
-                        Rgba([
-                            closest_color[0] as u8,
-                            closest_color[1] as u8,
-                            closest_color[2] as u8,
-                            pixel[3],
-                        ])
+                // Find the closest palette color
+                let closest_option = palette_lab
+                    .iter()
+                    .zip(self.palette.iter())
+                    .map(|(palette_lab, &palette_rgb)| {
+                        let distance = lab.distance(*palette_lab);
+                        (palette_rgb, distance)
+                    })
+                    .min_by(|(_, dist1), (_, dist2)| dist1.total_cmp(dist2));
+
+                match closest_option {
+                    Some((closest_color, _)) => Rgba([
+                        closest_color[0],
+                        closest_color[1],
+                        closest_color[2],
+                        pixel[3],
+                    ]),
+                    None => {
+                        // Handle cases where the iterator is empty, for example returning the original pixel or a default color
+                        // Here we return the original pixel
+                        *pixel
                     }
-                    None => *pixel,
                 }
             })
             .collect();
