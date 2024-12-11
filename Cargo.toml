@@ -18,5 +18,6 @@ codegen-units = 1
 
 [dependencies]
 image = "0.25.5"
+imageproc = "0.25.0"
 palette = "0.7.6"
 rayon = "1.10.0"
