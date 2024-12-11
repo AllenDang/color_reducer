@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1](https://github.com/AllenDang/color_reducer/compare/v0.3.0...v0.3.1) - 2024-12-11
+
+### Other
+
+- Fix cargo command in README
+- Update demo code
+
 ## [0.3.0](https://github.com/AllenDang/color_reducer/compare/v0.2.0...v0.3.0) - 2024-12-11
 
 ### Other
