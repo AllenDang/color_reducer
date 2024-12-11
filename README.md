@@ -83,7 +83,7 @@ let palette = vec![
 
 you will get
 
-![](https://raw.githubusercontent.com/AllenDang/pubstuff/91b2ceeee11e4e66972c9f4c077e22b9adb1ccad/images/color_reducer_result_demo.png)
+![](https://raw.githubusercontent.com/AllenDang/pubstuff/refs/heads/master/images/color_reducer_result_demo.png)
 
 ## Performance
 
