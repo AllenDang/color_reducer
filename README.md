@@ -56,6 +56,33 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+### Show case
+
+Use following white-to-black 16 color palette, you will get this
+
+```rust
+let palette = vec![
+    [255, 255, 255],
+    [238, 238, 238],
+    [221, 221, 221],
+    [204, 204, 204],
+    [187, 187, 187],
+    [170, 170, 170],
+    [153, 153, 153],
+    [136, 136, 136],
+    [119, 119, 119],
+    [102, 102, 102],
+    [85, 85, 85],
+    [68, 68, 68],
+    [51, 51, 51],
+    [34, 34, 34],
+    [17, 17, 17],
+    [0, 0, 0],
+];
+```
+
+![](https://raw.githubusercontent.com/AllenDang/pubstuff/91b2ceeee11e4e66972c9f4c077e22b9adb1ccad/images/color_reducer_result_demo.png)
+
 ## Performance
 
 - Parallel Processing: The library uses Rust's concurrency features to process the color reduction step efficiently.
