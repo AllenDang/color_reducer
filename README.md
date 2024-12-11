@@ -15,7 +15,7 @@ The **Color Reducer** library allows you to reduce the number of colors in an im
 
 Add this crate to your project:
 
-```toml
+```bash
 cargo add color_reducer
 ```
 
