@@ -1,0 +1,15 @@
+[package]
+name = "color_reducer"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+strip = true
+lto = true
+opt-level = 3
+codegen-units = 1
+
+[dependencies]
+image = "0.25.5"
+palette = "0.7.6"
+rayon = "1.10.0"
