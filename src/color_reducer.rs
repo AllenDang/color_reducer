@@ -1,8 +1,38 @@
-use std::collections::{HashMap, VecDeque};
+use std::collections::HashMap;
 
 use image::{DynamicImage, ImageBuffer, Rgba, RgbaImage};
 use palette::{cast, color_difference::EuclideanDistance, FromColor, Lab, Srgb};
 use rayon::prelude::*;
+
+// Union-Find Data Structure
+struct UnionFind {
+    parent: Vec<usize>,
+}
+
+impl UnionFind {
+    fn new(size: usize) -> Self {
+        UnionFind {
+            parent: (0..size).collect(),
+        }
+    }
+
+    fn find(&mut self, x: usize) -> usize {
+        if self.parent[x] != x {
+            // Path compression optimization
+            self.parent[x] = self.find(self.parent[x]);
+        }
+        self.parent[x]
+    }
+
+    fn union(&mut self, x: usize, y: usize) {
+        let x_root = self.find(x);
+        let y_root = self.find(y);
+        if x_root != y_root {
+            // Union by root
+            self.parent[y_root] = x_root;
+        }
+    }
+}
 
 pub struct ColorReducer {
     palette: Vec<[u8; 3]>,
@@ -75,49 +105,57 @@ impl ColorReducer {
             })
             .collect();
 
-        // Step 1: Connected component labeling
-        let mut labels = vec![0u32; (width * height) as usize]; // Store the label for each pixel
-        let mut label = 1u32; // Labels start from 1, 0 indicates not visited
-        let mut label_sizes = HashMap::new(); // Store the area size corresponding to each label
+        let mut labels = vec![0usize; (width * height) as usize];
+        let mut uf = UnionFind::new((width * height) as usize);
+        let mut next_label = 1usize;
 
+        // First Pass
         for y in 0..height {
             for x in 0..width {
                 let idx = (y * width + x) as usize;
-                if labels[idx] == 0 {
-                    // Not yet labeled, start a new region
-                    let current_color = simplified_pixels[idx];
-                    let mut queue = VecDeque::new();
-                    queue.push_back((x, y));
-                    labels[idx] = label;
-                    let mut size = 1usize;
+                let current_color = simplified_pixels[idx];
 
-                    while let Some((cx, cy)) = queue.pop_front() {
-                        // Check the adjacent pixels in four directions
-                        let neighbors = [
-                            (cx.wrapping_sub(1), cy), // left
-                            (cx + 1, cy),             // right
-                            (cx, cy.wrapping_sub(1)), // up
-                            (cx, cy + 1),             // down
-                        ];
+                // Neighbors (up and left)
+                let mut neighbor_labels = Vec::new();
 
-                        for &(nx, ny) in &neighbors {
-                            if nx < width && ny < height {
-                                let n_idx = (ny * width + nx) as usize;
-                                if labels[n_idx] == 0 && simplified_pixels[n_idx] == current_color {
-                                    labels[n_idx] = label;
-                                    queue.push_back((nx, ny));
-                                    size += 1;
-                                }
-                            }
-                        }
+                if x > 0 {
+                    let left_idx = idx - 1;
+                    if simplified_pixels[left_idx] == current_color {
+                        neighbor_labels.push(labels[left_idx]);
                     }
+                }
+                if y > 0 {
+                    let up_idx = idx - width as usize;
+                    if simplified_pixels[up_idx] == current_color {
+                        neighbor_labels.push(labels[up_idx]);
+                    }
+                }
 
-                    // Record the area size
-                    label_sizes.insert(label, size);
-                    label += 1;
+                if neighbor_labels.is_empty() {
+                    // Assign new label
+                    labels[idx] = next_label;
+                    next_label += 1;
+                } else {
+                    // Assign the smallest label
+                    let &min_label = neighbor_labels.iter().min().unwrap();
+                    labels[idx] = min_label;
+                    // Record equivalences
+                    for &label in &neighbor_labels {
+                        uf.union(min_label, label);
+                    }
                 }
             }
         }
+
+        // Second Pass
+        let mut label_sizes = HashMap::new();
+        (0..labels.len()).for_each(|idx| {
+            if labels[idx] != 0 {
+                let root_label = uf.find(labels[idx]);
+                labels[idx] = root_label;
+                *label_sizes.entry(root_label).or_insert(0usize) += 1;
+            }
+        });
 
         // Step 2: Region merging
         // Create a new pixel buffer to store the final pixel values
