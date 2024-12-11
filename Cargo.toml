@@ -1,6 +1,6 @@
 [package]
 name = "color_reducer"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "Simplify images by reducing the number of colors based on a predefined palette."
 categories = ["multimedia", "multimedia::images"]
