@@ -58,7 +58,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ### Show case
 
-Use following white-to-black 16 color palette, you will get this
+Use following white-to-black 16 color palette
 
 ```rust
 let palette = vec![
@@ -80,6 +80,8 @@ let palette = vec![
     [0, 0, 0],
 ];
 ```
+
+you will get
 
 ![](https://raw.githubusercontent.com/AllenDang/pubstuff/91b2ceeee11e4e66972c9f4c077e22b9adb1ccad/images/color_reducer_result_demo.png)
 
