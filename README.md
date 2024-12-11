@@ -13,11 +13,10 @@ The **Color Reducer** library allows you to reduce the number of colors in an im
 
 ## Installation
 
-Add the following to your `Cargo.toml`:
+Add this crate to your project:
 
 ```toml
-[dependencies]
-color_reducer = "0.1.0"
+cargo add color_reducer
 ```
 
 Then, run `cargo build` to fetch the library.
@@ -44,11 +43,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Add more colors as needed
     ];
 
-    // Set the area threshold for noise reduction
-    let area_threshold = 50;
-
     // Create a new ColorReducer instance
-    let reducer = ColorReducer::new(palette, area_threshold);
+    let reducer = ColorReducer::new(palette);
 
     // Process the image
     let reduced_img = reducer.reduce(&img)?;
