@@ -2,6 +2,13 @@
 name = "color_reducer"
 version = "0.1.0"
 edition = "2021"
+description = "Simplify images by reducing the number of colors based on a predefined palette."
+categories = ["multimedia", "multimedia::images"]
+license = "MIT/Apache-2.0"
+readme = "README.md"
+keywords = ["image", "color", "reduce"]
+homepage = "https://github.com/AllenDang/color_reducer"
+repository = "https://github.com/AllenDang/color_reducer"
 
 [profile.release]
 strip = true
